@@ -11,3 +11,7 @@ socket.on('disconnect', function () {
 socket.on('newMessage', function (message) {
     console.log('new Message', message);
 });
+
+socket.on('joinedRoom', function (message) {
+    console.log(message.message);
+});

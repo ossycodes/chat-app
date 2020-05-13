@@ -27,13 +27,18 @@ io.on("connection", (socket) => {
             createdAt: new Date().getTime()
         })
 
+        //emit event back to sender 
+        socket.emit('joinedRoom', {
+            message: "Welcome bros"
+        });
+
         //send back to client
         // socket.emit('newMessage', {
         //     from: message.from,
         //     text: message.text,
         //     createdAt: new Date().getTime()
         // });
-        
+
         //send to all clients except sender
         // socket.broadcast.emit('newMessage', {
         //     from: message.from,
