@@ -17,29 +17,38 @@ app.use(express.static(publicPath));
 io.on("connection", (socket) => {
     console.log("New user connected");
 
+    //send to client (this particular socket that just connected)
+    socket.emit('newMessage', {
+        from: 'Admin',
+        text: 'Welcome to the chat app',
+        createdAt: new Date().getTime()
+    });
+
+    //send to all other connected clients (all other connected sockets)
+    socket.broadcast.emit('newMessage', {
+        from: 'Admin',
+        text: 'New user joined',
+        createdAt: new Date().getTime()
+    });
+
     socket.on('createMessage', (message) => {
         console.log('createMessage', message);
 
-        // send to all connected clients
+        // send to all connected clients (all sockets)
         io.emit('newMessage', {
             from: message.from,
             text: message.text,
             createdAt: new Date().getTime()
         })
 
-        //emit event back to sender 
-        socket.emit('joinedRoom', {
-            message: "Welcome bros"
-        });
-
-        //send back to client
+        //send back to client (this particular socket)
         // socket.emit('newMessage', {
         //     from: message.from,
         //     text: message.text,
         //     createdAt: new Date().getTime()
         // });
 
-        //send to all clients except sender
+        //send to all clients except sender (this socket)
         // socket.broadcast.emit('newMessage', {
         //     from: message.from,
         //     text: message.text,
