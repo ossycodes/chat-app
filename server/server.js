@@ -6,7 +6,7 @@ const socketIO = require("socket.io");
 const publicPath = path.join(__dirname, '..', '/public');
 const port = process.env.PORT || 3000;
 const app = express();
-const generateMessage = require('./utils/message');
+const { generateMessage, generateLocationMessage } = require('./utils/message');
 /**
  * configure socketIO
  */
@@ -30,7 +30,7 @@ io.on("connection", (socket) => {
         // send to all connected clients (all sockets)
         io.emit('newMessage', generateMessage(message.from, message.text));
 
-        //trigger acknowledgement
+        //trigger acknowledgement without arguments
         cb();
         //trigger acknowledgement with argument
         // cb("error oo");
@@ -48,6 +48,11 @@ io.on("connection", (socket) => {
         //     text: message.text,
         //     createdAt: new Date().getTime()
         // });
+    });
+
+    socket.on('createLocationMessage', (coords) => {
+        //send user cordinates to `all connected clients`
+        io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude));
     });
 
     socket.on('disconnect', () => {
