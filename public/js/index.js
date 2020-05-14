@@ -56,12 +56,12 @@ locationButton.on('click', function () {
     //disable button
     locationButton.attr('disabled', 'disabled').text('Sending Location...');
 
-    navigator.geolocation.getCurrentPosition(function (postion) {
-        console.log(postion);
+    navigator.geolocation.getCurrentPosition(function (position) {
+        console.log(position);
         locationButton.removeAttr('disabled').text('Send Location');
         socket.emit('createLocationMessage', {
             latitude: position.coords.latitude,
-            longitude: postion.coords.longitude
+            longitude: position.coords.longitude
         });
     }, function () {
         locationButton.removeAttr('disabled').text('Send Location');
