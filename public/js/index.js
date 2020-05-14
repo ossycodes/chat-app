@@ -2,15 +2,6 @@ var socket = io();
 
 socket.on('connect', function () {
     console.log('connected to server');
-
-    // socket.emit('createMessage', { from: 'index.js@example.com', text: 'from index.js' }, function (error) {
-    //     if (error) {
-    //         console.log('something went wrong');
-    //     } else {
-    //         console.log('all good');
-    //     }
-    // })
-
 });
 
 socket.on('disconnect', function () {
@@ -34,14 +25,16 @@ socket.on('newLocationMessage', function (message) {
     jQuery('#messages').append(li);
 });
 
+var messageSelector = jQuery('[name=message]');
 jQuery('#message-form').on('submit', function (e) {
     e.preventDefault();
 
     socket.emit('createMessage', {
         from: 'User',
-        text: jQuery('[name=message]').val()
+        text: messageSelector.val()
     }, function () {
-        //do something after acknowledgement
+        //do something after acknowledgement, which is clear the input field
+        messageSelector.val('');
     });
 });
 
@@ -50,13 +43,19 @@ locationButton.on('click', function () {
     if (!navigator.geolocation) {
         return alert('Geolocation not supported by your browser.');
     }
+
+    //disable button
+    locationButton.attr('disabled', 'disabled').text('Sending Location...');
+
     navigator.geolocation.getCurrentPosition(function (postion) {
         console.log(postion);
+        locationButton.removeAttr('disabled').text('Send Location');
         socket.emit('createLocationMessage', {
             latitude: position.coords.latitude,
             longitude: postion.coords.longitude
         });
     }, function () {
+        locationButton.removeAttr('disabled').text('Send Location');
         alert('Unable to fetch location.')
     });
 });

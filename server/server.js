@@ -32,6 +32,7 @@ io.on("connection", (socket) => {
 
         //trigger acknowledgement without arguments
         cb();
+        
         //trigger acknowledgement with argument
         // cb("error oo");
 
