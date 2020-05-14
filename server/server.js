@@ -6,6 +6,7 @@ const socketIO = require("socket.io");
 const publicPath = path.join(__dirname, '..', '/public');
 const port = process.env.PORT || 3000;
 const app = express();
+const generateMessage = require('./utils/message');
 /**
  * configure socketIO
  */
@@ -18,28 +19,21 @@ io.on("connection", (socket) => {
     console.log("New user connected");
 
     //send to client (this particular socket that just connected)
-    socket.emit('newMessage', {
-        from: 'Admin',
-        text: 'Welcome to the chat app',
-        createdAt: new Date().getTime()
-    });
+    socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
 
     //send to all other connected clients (all other connected sockets)
-    socket.broadcast.emit('newMessage', {
-        from: 'Admin',
-        text: 'New user joined',
-        createdAt: new Date().getTime()
-    });
+    socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
 
-    socket.on('createMessage', (message) => {
+    socket.on('createMessage', (message, cb) => {
         console.log('createMessage', message);
 
         // send to all connected clients (all sockets)
-        io.emit('newMessage', {
-            from: message.from,
-            text: message.text,
-            createdAt: new Date().getTime()
-        })
+        io.emit('newMessage', generateMessage(message.from, message.text));
+
+        //trigger acknowledgement
+        cb();
+        //trigger acknowledgement with argument
+        // cb("error oo");
 
         //send back to client (this particular socket)
         // socket.emit('newMessage', {
@@ -54,7 +48,6 @@ io.on("connection", (socket) => {
         //     text: message.text,
         //     createdAt: new Date().getTime()
         // });
-
     });
 
     socket.on('disconnect', () => {
