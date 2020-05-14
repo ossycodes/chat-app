@@ -28,11 +28,11 @@ io.on("connection", (socket) => {
         console.log('createMessage', message);
 
         // send to all connected clients (all sockets)
-        io.emit('newMessage', generateMessage(message.from, message.text));
+        io.emit('newMessage', generateMessage(message.from, message.text, message.createdAt));
 
         //trigger acknowledgement without arguments
         cb();
-        
+
         //trigger acknowledgement with argument
         // cb("error oo");
 
