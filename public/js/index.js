@@ -11,21 +11,27 @@ socket.on('disconnect', function () {
 
 socket.on('newMessage', function (message) {
     console.log('new Message', message);
-    var li = jQuery('<li></li>');
     var formattedTime = moment(message.createdAt).format('hh:m:s a');
-    li.text(`${message.from}: ${message.text}  sentAt: ${formattedTime}`);
-    jQuery('#messages').append(li);
+    var template = jQuery('#message-template').html();
+    var html = Mustache.render(template, {
+        text: message.text,
+        from: message.from,
+        createdAt: formattedTime
+    });
+
+    jQuery('#messages').append(html);
 });
 
 socket.on('newLocationMessage', function (message) {
-    var li = jQuery('li></li>');
-    var formattedTime =  moment(message.createdAt).format('hh:m:s a');
-    var a = jQuery('<a target="_blank">My current location</a>');
+    var formattedTime = moment(message.createdAt).format('hh:m:s a');
+    var template = jQuery('#location-message-template').html();
+    var html = Mustache.render(template, {
+        from: message.from,
+        url: message.url,
+        createdAt: formattedTime
+    });
 
-    li.text(`${message.from}  sentAt:${formattedTime}`);
-    a.attr('href', message.url);
-    li.append(a);
-    jQuery('#messages').append(li);
+    jQuery('#messages').append(html);
 });
 
 var messageSelector = jQuery('[name=message]');
