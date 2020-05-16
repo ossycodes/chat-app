@@ -17,11 +17,29 @@ function scrollToBottom() {
 }
 
 socket.on('connect', function () {
-    console.log('connected to server');
+    var params = jQuery.deparam(window.location.search);
+    //emit event for joining a room
+    socket.emit('join', params, function (error) {
+        if (error) {
+            //redirect the user back to index.html page
+            alert(error);
+            window.location.href = "/";
+        } else {
+            console.log('no error :-)');
+        }
+    });
 });
 
 socket.on('disconnect', function () {
     console.log('Dsiconnected from server');
+});
+
+socket.on('updateUsersList', function (users) {
+    let ol = jQuery('<ol></ol>');
+    users.forEach((user) => {
+        ol.append(jQuery('<li></li>').text(user));
+    });
+    jQuery('#users').html(ol);
 });
 
 socket.on('newMessage', function (message) {
@@ -56,7 +74,6 @@ jQuery('#message-form').on('submit', function (e) {
     e.preventDefault();
 
     socket.emit('createMessage', {
-        from: 'User',
         text: messageSelector.val()
     }, function () {
         //do something after acknowledgement, which is clear the input field
@@ -74,7 +91,6 @@ locationButton.on('click', function () {
     locationButton.attr('disabled', 'disabled').text('Sending Location...');
 
     navigator.geolocation.getCurrentPosition(function (position) {
-        console.log(position);
         locationButton.removeAttr('disabled').text('Send Location');
         socket.emit('createLocationMessage', {
             latitude: position.coords.latitude,
